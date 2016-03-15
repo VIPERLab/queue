@@ -9,10 +9,11 @@
 /* Begin PBXBuildFile section */
 		C50856851C97EE2A002094FA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856841C97EE2A002094FA /* main.m */; };
 		C50856881C97EE2A002094FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856871C97EE2A002094FA /* AppDelegate.m */; };
-		C508568B1C97EE2A002094FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C508568A1C97EE2A002094FA /* ViewController.m */; };
+		C508568B1C97EE2A002094FA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C508568A1C97EE2A002094FA /* ViewController.mm */; };
 		C508568E1C97EE2A002094FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C508568C1C97EE2A002094FA /* Main.storyboard */; };
 		C50856901C97EE2A002094FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C508568F1C97EE2A002094FA /* Assets.xcassets */; };
 		C50856931C97EE2A002094FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C50856911C97EE2A002094FA /* LaunchScreen.storyboard */; };
+		C508569D1C97EE6C002094FA /* GJQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = C508569B1C97EE6C002094FA /* GJQueue.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,11 +22,13 @@
 		C50856861C97EE2A002094FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C50856871C97EE2A002094FA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		C50856891C97EE2A002094FA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		C508568A1C97EE2A002094FA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		C508568A1C97EE2A002094FA /* ViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ViewController.mm; sourceTree = "<group>"; };
 		C508568D1C97EE2A002094FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C508568F1C97EE2A002094FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C50856921C97EE2A002094FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C50856941C97EE2A002094FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C508569B1C97EE6C002094FA /* GJQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GJQueue.mm; sourceTree = "<group>"; };
+		C508569C1C97EE6C002094FA /* GJQueue.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = GJQueue.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +45,7 @@
 		C50856771C97EE2A002094FA = {
 			isa = PBXGroup;
 			children = (
+				C508569A1C97EE33002094FA /* Class */,
 				C50856821C97EE2A002094FA /* GJQueue */,
 				C50856811C97EE2A002094FA /* Products */,
 			);
@@ -61,7 +65,7 @@
 				C50856861C97EE2A002094FA /* AppDelegate.h */,
 				C50856871C97EE2A002094FA /* AppDelegate.m */,
 				C50856891C97EE2A002094FA /* ViewController.h */,
-				C508568A1C97EE2A002094FA /* ViewController.m */,
+				C508568A1C97EE2A002094FA /* ViewController.mm */,
 				C508568C1C97EE2A002094FA /* Main.storyboard */,
 				C508568F1C97EE2A002094FA /* Assets.xcassets */,
 				C50856911C97EE2A002094FA /* LaunchScreen.storyboard */,
@@ -77,6 +81,15 @@
 				C50856841C97EE2A002094FA /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C508569A1C97EE33002094FA /* Class */ = {
+			isa = PBXGroup;
+			children = (
+				C508569C1C97EE6C002094FA /* GJQueue.h */,
+				C508569B1C97EE6C002094FA /* GJQueue.mm */,
+			);
+			name = Class;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -149,7 +162,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C508568B1C97EE2A002094FA /* ViewController.m in Sources */,
+				C508569D1C97EE6C002094FA /* GJQueue.mm in Sources */,
+				C508568B1C97EE2A002094FA /* ViewController.mm in Sources */,
 				C50856881C97EE2A002094FA /* AppDelegate.m in Sources */,
 				C50856851C97EE2A002094FA /* main.m in Sources */,
 			);
