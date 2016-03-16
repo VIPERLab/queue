@@ -19,7 +19,11 @@
 #include <pthread.h>
 #define MAX_FRAME_SIZE 7000
 #define ITEM_MAX_COUNT 10
-
+typedef enum GJQueueType{
+    queueAssignType,
+    queueCopyType,
+    queueRetainType
+}GJQueueType;
 
 template <class T> class GJQueue{
 
@@ -29,22 +33,18 @@ private:
     long _inPointer;  //尾
     long _outPointer; //头
     int _maxBufferSize;
-    
-   
-
+    GJQueueType _queueType;
     
     pthread_mutex_t _mutex;
     pthread_cond_t _inCond;
     pthread_cond_t _outCond;
-    
-    
     pthread_mutex_t _uniqueLock;
     
     bool _mutexInit()
     {
-        if (!shouldWait) {
-            return false;
-        }
+//        if (!shouldWait) {
+//            return false;
+//        }
         pthread_mutex_init(&_mutex, NULL);
         pthread_cond_init(&_inCond, NULL);
         pthread_cond_init(&_outCond, NULL);
@@ -70,7 +70,7 @@ private:
             return false;
         }
         pthread_mutex_lock(&_mutex);
-        pthread_cond_wait(_cond, &_mutex);
+        int i = pthread_cond_wait(_cond, &_mutex);
         pthread_mutex_unlock(&_mutex);
         return true;
     }
@@ -107,23 +107,27 @@ public:
 #pragma mark DELEGATE
     bool shouldWait;  //没有数据时是否支持等待，需要多线程；
     
-    void (*popCopyBlock)(T* );  //deep copy with this
+    void (*popCopyBlock)(T* dest,T* soc);  //deep copy with this
     
-    void (*pushCopyBlock)(T* );
+    void (*pushCopyBlock)(T* dest,T* soc);
     
-    void (*dellocFreeCopyBlock)(T* buffer,int lenth);
     
-    GJQueue()
+    GJQueue(GJQueueType type)
     {
+        _queueType = type;
         shouldWait = false;
         _inPointer = 0;
         _outPointer = 0;
         _mutexInit();
         popCopyBlock = NULL;
         pushCopyBlock = NULL;
-        dellocFreeCopyBlock = NULL;
     };
+    
     bool queueCopyPop(T* temBuffer){
+        if (_queueType != queueCopyType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            return false;
+        }
         _lock(&_uniqueLock);
         if (_inPointer <= _outPointer) {
             _unLock(&_uniqueLock);
@@ -136,21 +140,24 @@ public:
             GJQueueLOG("after Wait in.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         }
         
-        long temPoint = _outPointer;
+        if (popCopyBlock != NULL) {
+            popCopyBlock(temBuffer, &buffer[_outPointer%ITEM_MAX_COUNT]);
+        }else{
+            *temBuffer = buffer[_outPointer%ITEM_MAX_COUNT];
+        }
         _outPointer++;
         _mutexSignal(&_outCond);
         GJQueueLOG("after signal out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         _unLock(&_uniqueLock);
         
-        if (popCopyBlock != NULL) {
-            popCopyBlock(&buffer[temPoint%ITEM_MAX_COUNT]);
-        }else{
-            *temBuffer = buffer[temPoint%ITEM_MAX_COUNT];
-        }
+        
         return true;
     }
     bool queueCopyPush(T* temBuffer){
-        
+        if (_queueType != queueCopyType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            return false;
+        }
         _lock(&_uniqueLock);
         if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
             _unLock(&_uniqueLock);
@@ -163,20 +170,24 @@ public:
             _lock(&_uniqueLock);
             GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         }
-        long temInPointer = _inPointer;
+        if (pushCopyBlock != NULL) {
+            pushCopyBlock(&buffer[_inPointer%ITEM_MAX_COUNT],temBuffer);
+        }else{
+            buffer[_inPointer%ITEM_MAX_COUNT] = *temBuffer;
+        }
         _inPointer++;
         _mutexSignal(&_inCond);
         GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         _unLock(&_uniqueLock);
-        if (pushCopyBlock != NULL) {
-            pushCopyBlock(&buffer[temInPointer%ITEM_MAX_COUNT]);
-        }else{
-            buffer[temInPointer%ITEM_MAX_COUNT] = *temBuffer;
-        }
+       
         return true;
     }
     
     bool queueRetainPop(T** temBuffer){
+        if (_queueType != queueRetainType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            return false;
+        }
         _lock(&_uniqueLock);
         if (_inPointer <= _outPointer) {
             _unLock(&_uniqueLock);
@@ -198,7 +209,10 @@ public:
     }
     
     bool queueRetainPush(T* temBuffer){
-        
+        if (_queueType != queueRetainType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            return false;
+        }
         _lock(&_uniqueLock);
         if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
             _unLock(&_uniqueLock);
@@ -220,7 +234,10 @@ public:
     }
     
     bool queuePush(T temBuffer){
-        
+        if (_queueType != queueAssignType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            return false;
+        }
         _lock(&_uniqueLock);
         if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
             _unLock(&_uniqueLock);
@@ -243,12 +260,21 @@ public:
     }
     
     T queuePop(bool* result){
+        if (_queueType != queueAssignType) {
+            GJQueueLOG("queue type wrong!!! ----------\n");
+            assert(0);
+            return T();
+        }
         _lock(&_uniqueLock);
         if (_inPointer <= _outPointer) {
             _unLock(&_uniqueLock);
             GJQueueLOG("begin Wait in ----------\n");
             if (!_mutexWait(&_inCond)) {
-                return false;
+                if (result != NULL) {
+                     *result = false;
+                }
+                assert(0);
+                return T();
             }
             _lock(&_uniqueLock);
             

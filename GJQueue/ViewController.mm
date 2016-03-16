@@ -8,19 +8,42 @@
 
 #import "ViewController.h"
 #import "GJQueue.h"
-
+typedef struct st{
+    int a;
+    char* c;
+    
+}st;
 
 @interface ViewController ()
 {
-    GJQueue<int>* _queue;
+    GJQueue<st>* _queue;
+    st _s;
+    dispatch_queue_t popq;
+    dispatch_queue_t pushq;
 }
 @end
 
 @implementation ViewController
-
+static void popC(st* d,st* s){
+    d->c = (char*)malloc(strlen(s->c)+1);
+    memcpy(d->c, s->c, strlen(s->c)+1);
+    d->a = s->a;
+    free(s->c);
+}
+static void pushC(st* d,st* s){
+    d->c = (char*)malloc(strlen(s->c)+1);
+    memcpy(d->c, s->c, strlen(s->c)+1);
+    d->a = s->a;
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _queue = new GJQueue<int>();
+    _queue = new GJQueue<st>(queueCopyType);
+    _queue->pushCopyBlock = pushC;
+    _queue->popCopyBlock = popC;
+    _queue->shouldWait = true;
+    
+    popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
+    pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
     UIButton* btn = [[UIButton alloc]initWithFrame:(CGRect){100,100,100,60}];
     [btn setBackgroundColor:[UIColor greenColor]];
     [btn setTitle:@"push" forState:UIControlStateNormal];
@@ -35,16 +58,33 @@
 }
 
 -(void)push
-{   static int i;
-    i++;
-    _queue->queuePush(i);
-    NSLog(@"push");
+{
+   
+    dispatch_async(pushq, ^{
+        __block st t;
+        static int i;
+        char a[10] = "hello wor";
+        t.c = a;
+        t.a = i++;
+        _queue->queueCopyPush(&t);
+    });
+//    NSLog(@"push %d",i);
 }
 -(void)pop{
 //    int *j ;
 //    _queue->queueRetainPop(&j);
     
-    NSLog(@"pop:%d",_queue->queuePop(NULL));
+    
+    dispatch_async(popq, ^{
+        st t;
+        _queue->queueCopyPop(&t);
+    
+        NSLog(@"pop:%s",t.c);
+        free(t.c);
+    }
+                
+    );
+
 }
 
 - (void)didReceiveMemoryWarning {
