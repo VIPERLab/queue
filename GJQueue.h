@@ -17,19 +17,16 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#define MAX_FRAME_SIZE 7000
 #define ITEM_MAX_COUNT 10
 typedef enum GJQueueType{
     queueAssignType,
     queueCopyType,
-    queueRetainType
 }GJQueueType;
 
 template <class T> class GJQueue{
 
 private:
     T buffer[ITEM_MAX_COUNT];
-    T* retainBuffer[ITEM_MAX_COUNT];
     long _inPointer;  //尾
     long _outPointer; //头
     int _maxBufferSize;
@@ -70,7 +67,7 @@ private:
             return false;
         }
         pthread_mutex_lock(&_mutex);
-        int i = pthread_cond_wait(_cond, &_mutex);
+        pthread_cond_wait(_cond, &_mutex);
         pthread_mutex_unlock(&_mutex);
         return true;
     }
@@ -183,55 +180,6 @@ public:
         return true;
     }
     
-    bool queueRetainPop(T** temBuffer){
-        if (_queueType != queueRetainType) {
-            GJQueueLOG("queue type wrong!!! ----------\n");
-            return false;
-        }
-        _lock(&_uniqueLock);
-        if (_inPointer <= _outPointer) {
-            _unLock(&_uniqueLock);
-            GJQueueLOG("begin Wait in ----------\n");
-            if (!_mutexWait(&_inCond)) {
-                return false;
-            }
-            _lock(&_uniqueLock);
-            
-            GJQueueLOG("after Wait in.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-        }
-        
-        *temBuffer = retainBuffer[_outPointer%ITEM_MAX_COUNT];
-        _outPointer++;
-        _mutexSignal(&_outCond);
-        GJQueueLOG("after signal out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-        _unLock(&_uniqueLock);
-        return true;
-    }
-    
-    bool queueRetainPush(T* temBuffer){
-        if (_queueType != queueRetainType) {
-            GJQueueLOG("queue type wrong!!! ----------\n");
-            return false;
-        }
-        _lock(&_uniqueLock);
-        if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
-            _unLock(&_uniqueLock);
-            
-            GJQueueLOG("begin Wait out ----------\n");
-            if (!_mutexWait(&_outCond)) {
-                return false;
-            }
-            _lock(&_uniqueLock);
-            GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-        }
-        retainBuffer[_inPointer%ITEM_MAX_COUNT] = temBuffer;
-        _inPointer++;
-        
-        _mutexSignal(&_inCond);
-        GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-        _unLock(&_uniqueLock);
-        return true;
-    }
     
     bool queuePush(T temBuffer){
         if (_queueType != queueAssignType) {
