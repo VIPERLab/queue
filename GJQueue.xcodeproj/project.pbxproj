@@ -312,6 +312,7 @@
 				C50856991C97EE2A002094FA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
