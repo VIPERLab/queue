@@ -19,8 +19,8 @@
 #include <pthread.h>
 #define ITEM_MAX_COUNT 10
 typedef enum GJQueueType{
-    queueAssignType,
-    queueCopyType,
+    queueAssignType,///直接赋值到列队
+    queueCopyType,///支持深拷贝，自定义
 }GJQueueType;
 
 template <class T> class GJQueue{
@@ -81,7 +81,6 @@ private:
         pthread_mutex_unlock(&_mutex);
         return true;
     }
-    
     bool _lock(pthread_mutex_t* mutex){
         if (!shouldWait) {
             return false;
@@ -103,11 +102,12 @@ public:
 
 #pragma mark DELEGATE
     bool shouldWait;  //没有数据时是否支持等待，需要多线程；
-    
-    void (*popCopyBlock)(T* dest,T* soc);  //deep copy with this
-    
+    /**
+     *  //自定义深复制，比如需要复制结构体里面的指针需要复制，为空时则直接赋值指针；
+     *dest 为目标地址，soc是赋值源
+     */
+    void (*popCopyBlock)(T* dest,T* soc);
     void (*pushCopyBlock)(T* dest,T* soc);
-    
     
     GJQueue(GJQueueType type)
     {
@@ -120,6 +120,13 @@ public:
         pushCopyBlock = NULL;
     };
     
+    /**
+     *  深拷贝
+     *
+     *  @param temBuffer 用来接收推出的数据
+     *
+     *  @return 结果
+     */
     bool queueCopyPop(T* temBuffer){
         if (_queueType != queueCopyType) {
             GJQueueLOG("queue type wrong!!! ----------\n");
@@ -221,11 +228,11 @@ public:
                 if (result != NULL) {
                      *result = false;
                 }
+                GJQueueLOG("信号等待出错")
                 assert(0);
                 return T();
             }
             _lock(&_uniqueLock);
-            
             GJQueueLOG("after Wait in.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         }
         
