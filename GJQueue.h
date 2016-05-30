@@ -59,8 +59,8 @@ public:
     void (*popCopyBlock)(T* dest,T* soc);//出栈时调用，释放压栈时的内存
     void (*pushCopyBlock)(T* dest,T* soc);//压栈时调用，用于自定义深复制，必要时需要申请内存，
     
-    bool queueCopyPop(T* temBuffer);
-    bool queueCopyPush(T* temBuffer);
+    bool queuePop(T* temBuffer);
+    bool queuePush(T* temBuffer);
     GJQueue();
 };
 
@@ -85,7 +85,7 @@ GJQueue<T>::GJQueue()
  *  @return 结果
  */
 template<class T>
-bool GJQueue<T>::queueCopyPop(T* temBuffer){
+bool GJQueue<T>::queuePop(T* temBuffer){
     
     _lock(&_uniqueLock);
     if (_inPointer <= _outPointer) {
@@ -111,7 +111,7 @@ bool GJQueue<T>::queueCopyPop(T* temBuffer){
     return true;
 }
 template<class T>
-bool GJQueue<T>::queueCopyPush(T* temBuffer){
+bool GJQueue<T>::queuePush(T* temBuffer){
     
     _lock(&_uniqueLock);
     if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {

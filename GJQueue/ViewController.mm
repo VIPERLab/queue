@@ -81,7 +81,7 @@ static void pushC(st* d,st* s){
         char a[10] = " sefd";
         t.c = a;
         t.a = i++;
-    _queue.queueCopyPush(&t);
+    _queue.queuePush(&t);
 //    NSLog(@"push %d",i);
 }
 -(void)pop{
@@ -90,7 +90,7 @@ static void pushC(st* d,st* s){
     
     
         st t;
-        if (_queue.queueCopyPop(&t)) {
+        if (_queue.queuePop(&t)) {
             NSLog(@"pop:%d",t.a);
         };
 
