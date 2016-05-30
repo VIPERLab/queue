@@ -16,6 +16,7 @@ typedef struct st{
 
 @interface ViewController ()
 {
+    bool run;
     GJQueue<st>* _queue;
     st _s;
     dispatch_queue_t popq;
@@ -37,10 +38,13 @@ static void pushC(st* d,st* s){
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _queue = new GJQueue<st>(queueCopyType);
+    
+    run = YES;
+    _queue = new GJQueue<st>();
     _queue->pushCopyBlock = pushC;
     _queue->popCopyBlock = popC;
-    _queue->shouldWait = true;
+    _queue->shouldWait = YES;
+    _queue->shouldNonatomic = true;
     
     popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
     pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
@@ -55,19 +59,30 @@ static void pushC(st* d,st* s){
     [btn setBackgroundColor:[UIColor greenColor]];
     [btn addTarget:self action:@selector(pop) forControlEvents:UIControlEventTouchUpInside];
     [btn setTitle:@"pop" forState:UIControlStateNormal];    // Do any additional setup after loading the view, typically from a nib.
+    dispatch_async(pushq, ^{
+        while (run) {
+            [self push];
+            sleep(0.05);
+        }
+        
+    });
+    dispatch_async(popq, ^{
+        while (run) {
+            [self pop];
+            sleep(0.05);
+        }
+    });
 }
 
 -(void)push
 {
    
-    dispatch_async(pushq, ^{
         __block st t;
         static int i;
-        char a[10] = "hello wor";
+        char a[10] = " sefd";
         t.c = a;
         t.a = i++;
     _queue->queueCopyPush(&t);
-    });
 //    NSLog(@"push %d",i);
 }
 -(void)pop{
@@ -75,18 +90,16 @@ static void pushC(st* d,st* s){
 //    _queue->queueRetainPop(&j);
     
     
-    dispatch_async(popq, ^{
         st t;
-        _queue->queueCopyPop(&t);
-    
-        NSLog(@"pop:%s",t.c);
-        free(t.c);
-    }
-                
-    );
+        if (_queue->queueCopyPop(&t)) {
+            NSLog(@"pop:%d",t.a);
+        };
 
 }
 
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
+    run = !run;
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
