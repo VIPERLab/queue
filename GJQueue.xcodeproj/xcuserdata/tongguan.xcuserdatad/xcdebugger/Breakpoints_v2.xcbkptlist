@@ -103,7 +103,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
             endingLineNumber = "94"
-            landmarkName = "queueCopyPop(T* temBuffer)"
+            landmarkName = "queuePop(T* temBuffer)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -135,7 +135,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "104"
             endingLineNumber = "104"
-            landmarkName = "queueCopyPop(T* temBuffer)"
+            landmarkName = "queuePop(T* temBuffer)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

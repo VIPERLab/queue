@@ -61,10 +61,14 @@ public:
     
     bool queuePop(T* temBuffer);
     bool queuePush(T* temBuffer);
+    int getCurrentCount();
     GJQueue();
 };
 
-
+template<class T>
+int GJQueue<T>::getCurrentCount(){
+    return _outPointer - _inPointer;
+}
 template<class T>
 GJQueue<T>::GJQueue()
 {
