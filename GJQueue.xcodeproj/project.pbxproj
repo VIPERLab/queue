@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,7 +13,7 @@
 		C508568E1C97EE2A002094FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C508568C1C97EE2A002094FA /* Main.storyboard */; };
 		C50856901C97EE2A002094FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C508568F1C97EE2A002094FA /* Assets.xcassets */; };
 		C50856931C97EE2A002094FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C50856911C97EE2A002094FA /* LaunchScreen.storyboard */; };
-		C508569D1C97EE6C002094FA /* GJQueue.mm in Sources */ = {isa = PBXBuildFile; fileRef = C508569B1C97EE6C002094FA /* GJQueue.mm */; };
+		C508569D1C97EE6C002094FA /* GJQueue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C508569B1C97EE6C002094FA /* GJQueue.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 		C508568F1C97EE2A002094FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C50856921C97EE2A002094FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C50856941C97EE2A002094FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C508569B1C97EE6C002094FA /* GJQueue.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GJQueue.mm; sourceTree = "<group>"; };
+		C508569B1C97EE6C002094FA /* GJQueue.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; path = GJQueue.cpp; sourceTree = "<group>"; };
 		C508569C1C97EE6C002094FA /* GJQueue.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = GJQueue.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -87,7 +87,7 @@
 			isa = PBXGroup;
 			children = (
 				C508569C1C97EE6C002094FA /* GJQueue.h */,
-				C508569B1C97EE6C002094FA /* GJQueue.mm */,
+				C508569B1C97EE6C002094FA /* GJQueue.cpp */,
 			);
 			name = Class;
 			sourceTree = "<group>";
@@ -127,7 +127,7 @@
 				};
 			};
 			buildConfigurationList = C508567B1C97EE2A002094FA /* Build configuration list for PBXProject "GJQueue" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -162,7 +162,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C508569D1C97EE6C002094FA /* GJQueue.mm in Sources */,
+				C508569D1C97EE6C002094FA /* GJQueue.cpp in Sources */,
 				C508568B1C97EE2A002094FA /* ViewController.mm in Sources */,
 				C50856881C97EE2A002094FA /* AppDelegate.m in Sources */,
 				C50856851C97EE2A002094FA /* main.m in Sources */,
@@ -275,6 +275,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				GCC_INPUT_FILETYPE = automatic;
 				INFOPLIST_FILE = GJQueue/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";
@@ -288,6 +291,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				GCC_INPUT_FILETYPE = automatic;
 				INFOPLIST_FILE = GJQueue/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "-ObjC";

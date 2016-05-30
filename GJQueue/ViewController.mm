@@ -66,7 +66,7 @@ static void pushC(st* d,st* s){
         char a[10] = "hello wor";
         t.c = a;
         t.a = i++;
-        _queue->queueCopyPush(&t);
+    _queue->queueCopyPush(&t);
     });
 //    NSLog(@"push %d",i);
 }
