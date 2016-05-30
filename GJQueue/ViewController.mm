@@ -21,6 +21,7 @@ typedef struct st{
     st _s;
     dispatch_queue_t popq;
     dispatch_queue_t pushq;
+    NSDate* date;
 }
 @end
 
@@ -38,8 +39,9 @@ static void pushC(st* d,st* s){
 }
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    date = [NSDate date];
     run = YES;
+    _queue.autoResize = false;
     _queue.pushCopyBlock = pushC;
     _queue.popCopyBlock = popC;
     _queue.shouldWait = YES;
@@ -61,23 +63,21 @@ static void pushC(st* d,st* s){
     dispatch_async(pushq, ^{
         while (run) {
             [self push];
-            sleep(0.05);
+            sleep(0.2);
         }
-        
     });
     dispatch_async(popq, ^{
-        while (run) {
+        while (1) {
             [self pop];
-            sleep(0.05);
+            sleep(0.2);
         }
     });
 }
-
+static int i;
 -(void)push
 {
    
         __block st t;
-        static int i;
         char a[10] = " sefd";
         t.c = a;
         t.a = i++;
@@ -95,9 +95,11 @@ static void pushC(st* d,st* s){
         };
 
 }
-
+//7308/s
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event{
     run = !run;
+    
+    NSLog(@"rate:%f\n\n\n",i/[[NSDate date]timeIntervalSinceDate:date]);
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
