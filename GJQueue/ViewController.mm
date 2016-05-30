@@ -17,7 +17,7 @@ typedef struct st{
 @interface ViewController ()
 {
     bool run;
-    GJQueue<st>* _queue;
+    GJQueue<st> _queue;
     st _s;
     dispatch_queue_t popq;
     dispatch_queue_t pushq;
@@ -40,11 +40,10 @@ static void pushC(st* d,st* s){
     [super viewDidLoad];
     
     run = YES;
-    _queue = new GJQueue<st>();
-    _queue->pushCopyBlock = pushC;
-    _queue->popCopyBlock = popC;
-    _queue->shouldWait = YES;
-    _queue->shouldNonatomic = true;
+    _queue.pushCopyBlock = pushC;
+    _queue.popCopyBlock = popC;
+    _queue.shouldWait = YES;
+    _queue.shouldNonatomic = true;
     
     popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
     pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
@@ -82,7 +81,7 @@ static void pushC(st* d,st* s){
         char a[10] = " sefd";
         t.c = a;
         t.a = i++;
-    _queue->queueCopyPush(&t);
+    _queue.queueCopyPush(&t);
 //    NSLog(@"push %d",i);
 }
 -(void)pop{
@@ -91,7 +90,7 @@ static void pushC(st* d,st* s){
     
     
         st t;
-        if (_queue->queueCopyPop(&t)) {
+        if (_queue.queueCopyPop(&t)) {
             NSLog(@"pop:%d",t.a);
         };
 

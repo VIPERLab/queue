@@ -61,8 +61,6 @@ public:
     
     bool queueCopyPop(T* temBuffer);
     bool queueCopyPush(T* temBuffer);
-    bool queuePush(T temBuffer);
-    bool queuePop(T result);
     GJQueue();
 };
 
@@ -140,56 +138,7 @@ bool GJQueue<T>::queueCopyPush(T* temBuffer){
     return true;
 }
 
-template<class T>
-bool GJQueue<T>::queuePush(T temBuffer){
-    
-    _lock(&_uniqueLock);
-    if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
-        _unLock(&_uniqueLock);
-        
-        GJQueueLOG("begin Wait out ----------\n");
-        
-        if (!_mutexWait(&_outCond)) {
-            return false;
-        }
-        _lock(&_uniqueLock);
-        GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-    }
-    buffer[_inPointer%ITEM_MAX_COUNT] = temBuffer;
-    _inPointer++;
-    
-    _mutexSignal(&_inCond);
-    GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
-    _unLock(&_uniqueLock);
-    return true;
-}
 
-template<class T>
-bool GJQueue<T>::queuePop(T result){
-    
-    _lock(&_uniqueLock);
-    if (_inPointer <= _outPointer) {
-        _unLock(&_uniqueLock);
-        GJQueueLOG("begin Wait in ----------\n");
-        if (!_mutexWait(&_inCond)) {
-            
-            GJQueueLOG("信号等待出错")
-            assert(0);
-            return false;
-        }
-        _lock(&_uniqueLock);
-        GJQueueLOG("after Wait in.in:%ld  out:%ld----------\n",_inPointer,_outPointer);
-    }
-    
-    long temPoint = _outPointer;
-    result = buffer[temPoint%ITEM_MAX_COUNT];
-    _outPointer++;
-    _mutexSignal(&_outCond);
-    GJQueueLOG("after signal out.in:%ld  out:%ld----------\n",_inPointer,_outPointer);
-    _unLock(&_uniqueLock);
-    return true;
-    
-}
 
 template<class T>
 bool GJQueue<T>::_mutexInit()
