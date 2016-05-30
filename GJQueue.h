@@ -9,7 +9,6 @@
 
 #ifndef GJQueue_h
 #define GJQueue_h
-
 #include <stdio.h>
 #include <pthread.h>
 #include <assert.h>
@@ -19,16 +18,17 @@
 #define GJQueueLOG(format, ...)
 #endif
 
-#define ITEM_MAX_COUNT 10
+#define DEFAULT_MAX_COUNT 10
 
 
 template <class T> class GJQueue{
 
 private:
-    T buffer[ITEM_MAX_COUNT];
+    T *buffer;
     long _inPointer;  //尾
     long _outPointer; //头
-    int _maxBufferSize;
+    int _Capacity;
+    int _allocSize;
     
     pthread_mutex_t _mutex;
     pthread_cond_t _inCond;
@@ -42,15 +42,17 @@ private:
     bool _mutexSignal(pthread_cond_t* _cond);
     bool _lock(pthread_mutex_t* mutex);
     bool _unLock(pthread_mutex_t* mutex);
+    void _init();
    
 public:
 
     ~GJQueue(){
-            _mutexDestory();
+        _mutexDestory();
+        free(buffer);
     };
 
 #pragma mark DELEGATE
-    bool shouldWait;  //没有数据时是否支持等待，
+    bool shouldWait;  //没有数据时是否支持等待，当为autoResize 为YES时，push永远不会等待
     bool shouldNonatomic; //是否多线程，
     /**
      *  //自定义深复制，比如需要复制结构体里面的指针需要复制，为空时则直接赋值指针；
@@ -62,7 +64,9 @@ public:
     bool queuePop(T* temBuffer);
     bool queuePush(T* temBuffer);
     int getCurrentCount();
+    GJQueue(int capacity);
     GJQueue();
+    
 };
 
 template<class T>
@@ -72,6 +76,24 @@ int GJQueue<T>::getCurrentCount(){
 template<class T>
 GJQueue<T>::GJQueue()
 {
+    _Capacity = DEFAULT_MAX_COUNT;
+    _init();
+}
+template<class T>
+GJQueue<T>::GJQueue(int capacity)
+{
+    _Capacity = capacity;
+    if (capacity <=0) {
+        _Capacity = DEFAULT_MAX_COUNT;
+    }
+    _init();
+};
+
+template<class T>void
+GJQueue<T>::_init()
+{
+    buffer = (T*)malloc(sizeof(T)*_Capacity);
+    _allocSize = _Capacity;
     shouldWait = false;
     shouldNonatomic = false;
     _inPointer = 0;
@@ -79,7 +101,7 @@ GJQueue<T>::GJQueue()
     _mutexInit();
     popCopyBlock = NULL;
     pushCopyBlock = NULL;
-};
+}
 
 /**
  *  深拷贝
@@ -104,9 +126,9 @@ bool GJQueue<T>::queuePop(T* temBuffer){
     }
     
     if (popCopyBlock != NULL) {
-        popCopyBlock(temBuffer, &buffer[_outPointer%ITEM_MAX_COUNT]);
+        popCopyBlock(temBuffer, &buffer[_outPointer%_allocSize]);
     }else{
-        *temBuffer = buffer[_outPointer%ITEM_MAX_COUNT];
+        *temBuffer = buffer[_outPointer%_allocSize];
     }
     _outPointer++;
     _mutexSignal(&_outCond);
@@ -118,7 +140,7 @@ template<class T>
 bool GJQueue<T>::queuePush(T* temBuffer){
     
     _lock(&_uniqueLock);
-    if ((_inPointer % ITEM_MAX_COUNT == _outPointer % ITEM_MAX_COUNT && _inPointer > _outPointer)) {
+    if ((_inPointer % _allocSize == _outPointer % _allocSize && _inPointer > _outPointer)) {
         _unLock(&_uniqueLock);
         
         GJQueueLOG("begin Wait out ----------\n");
@@ -130,9 +152,9 @@ bool GJQueue<T>::queuePush(T* temBuffer){
         GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     }
     if (pushCopyBlock != NULL) {
-        pushCopyBlock(&buffer[_inPointer%ITEM_MAX_COUNT],temBuffer);
+        pushCopyBlock(&buffer[_inPointer%_allocSize],temBuffer);
     }else{
-        buffer[_inPointer%ITEM_MAX_COUNT] = *temBuffer;
+        buffer[_inPointer%_allocSize] = *temBuffer;
     }
     _inPointer++;
     _mutexSignal(&_inCond);
@@ -161,9 +183,9 @@ bool GJQueue<T>::_mutexInit()
 template<class T>
 bool GJQueue<T>::_mutexDestory()
 {
-//    if (!shouldWait) {
-//        return false;
-//    }
+    //    if (!shouldWait) {
+    //        return false;
+    //    }
     pthread_mutex_destroy(&_mutex);
     pthread_cond_destroy(&_inCond);
     pthread_cond_destroy(&_outCond);
