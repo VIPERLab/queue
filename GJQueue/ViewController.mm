@@ -24,7 +24,6 @@ typedef struct st{
     NSDate* date;
 }
 @end
-
 @implementation ViewController
 static void popC(st* d,st* s){
     d->c = (char*)malloc(strlen(s->c)+1);
@@ -45,8 +44,21 @@ static void pushC(st* d,st* s){
     _queue.pushCopyBlock = pushC;
     _queue.popCopyBlock = popC;
     _queue.shouldWait = YES;
-    _queue.shouldNonatomic = true;
+    _queue.shouldNonatomic = YES;
     
+    //push pop不同线程 线程睡0.2
+    //autoresize = false,wait = yes nonatomic = yes    9239.936629/s
+    //autoresize = true,wait = yes nonatomic = yes  8105.421133/s
+    //autoresize = true,wait = no nonatomic = yes 14365.428890
+    //autoresize = false,wait = no nonatomic = yes 37086.887812
+    
+    //push pop相同线程 线程睡0.2
+    //autoresize = false,wait = no nonatomic = yes                  11015.503520
+    //autoresize = false,wait = no nonatomic = no                  10523.068085
+    //autoresize = false,wait = yes nonatomic = yes                  10078.879488
+    //autoresize = false,wait = yes nonatomic = no                  9621.923693
+
+
     popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
     pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
     UIButton* btn = [[UIButton alloc]initWithFrame:(CGRect){100,100,100,60}];
@@ -63,15 +75,16 @@ static void pushC(st* d,st* s){
     dispatch_async(pushq, ^{
         while (run) {
             [self push];
-            sleep(0.2);
-        }
-    });
-    dispatch_async(popq, ^{
-        while (1) {
             [self pop];
             sleep(0.2);
         }
     });
+//    dispatch_async(popq, ^{
+//        while (run) {
+//            [self pop];
+//            sleep(0.2);
+//        }
+//    });
 }
 static int i;
 -(void)push

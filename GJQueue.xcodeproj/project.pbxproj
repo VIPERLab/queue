@@ -17,7 +17,6 @@
 
 /* Begin PBXFileReference section */
 		AEB50CD21CFC739300625586 /* GJQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJQueue.h; sourceTree = "<group>"; };
-		AEB50CD31CFC739300625586 /* GJQueue_ internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GJQueue_ internal.h"; sourceTree = "<group>"; };
 		C50856801C97EE2A002094FA /* GJQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GJQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C50856841C97EE2A002094FA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C50856861C97EE2A002094FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -86,7 +85,6 @@
 			isa = PBXGroup;
 			children = (
 				AEB50CD21CFC739300625586 /* GJQueue.h */,
-				AEB50CD31CFC739300625586 /* GJQueue_ internal.h */,
 			);
 			name = Class;
 			sourceTree = "<group>";

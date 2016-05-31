@@ -120,10 +120,10 @@ bool GJQueue<T>::queuePop(T* temBuffer){
         _unLock(&_uniqueLock);
         GJQueueLOG("begin Wait in ----------\n");
         if (!_mutexWait(&_inCond)) {
+            GJQueueLOG("fail Wait in ----------\n");
             return false;
         }
         _lock(&_uniqueLock);
-        
         GJQueueLOG("after Wait in.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     }
     
@@ -150,6 +150,7 @@ bool GJQueue<T>::queuePush(T* temBuffer){
             
             GJQueueLOG("begin Wait out ----------\n");
             if (!_mutexWait(&_outCond)) {
+                GJQueueLOG("fail begin Wait out ----------\n");
                 return false;
             }
             
