@@ -65,7 +65,7 @@ public:
     
     bool queuePop(T* temBuffer);
     bool queuePush(T* temBuffer);
-    int getCurrentCount();
+    int currentLenth();
     
     //根据index获得vause,当超过_inPointer和_outPointer范围则失败，用于遍历数组，不会产生压栈推栈作用
     bool getValueWithIndex(const long *index,T* value);
@@ -75,7 +75,7 @@ public:
 };
 
 template<class T>
-int GJQueue<T>::getCurrentCount(){
+int GJQueue<T>::currentLenth(){
     return _outPointer - _inPointer;
 }
 template<class T>
