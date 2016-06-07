@@ -86,9 +86,7 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "73"
-            endingLineNumber = "73"
-            landmarkName = "GJQueue()"
-            landmarkType = "7">
+            endingLineNumber = "73">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -103,7 +101,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
             endingLineNumber = "94"
-            landmarkName = "queuePop(T* temBuffer)"
+            landmarkName = "_init()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -119,7 +117,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "223"
             endingLineNumber = "223"
-            landmarkName = "_mutexWait(pthread_cond_t* _cond)"
+            landmarkName = "_mutexSignal(pthread_cond_t* _cond)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -135,7 +133,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "104"
             endingLineNumber = "104"
-            landmarkName = "queuePop(T* temBuffer)"
+            landmarkName = "_init()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

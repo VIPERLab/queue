@@ -54,17 +54,21 @@ public:
 #pragma mark DELEGATE
     bool shouldWait;  //没有数据时是否支持等待，当为autoResize 为YES时，push永远不会等待
     bool shouldNonatomic; //是否多线程，
-    bool autoResize; //当为YES时，push永远不会等待
+    //是否支持自动增长，当为YES时，push永远不会等待，只会重新申请内存,默认为false
+    bool autoResize;
     /**
      *  //自定义深复制，比如需要复制结构体里面的指针需要复制，为空时则直接赋值指针；
      *dest 为目标地址，soc是赋值源
      */
-    void (*popCopyBlock)(T* dest,T* soc);//出栈时调用，释放压栈时的内存
+    void (*popCopyBlock)(T* dest,T* soc);//出队列时调用，释放入队列时的内存
     void (*pushCopyBlock)(T* dest,T* soc);//压栈时调用，用于自定义深复制，必要时需要申请内存，
     
     bool queuePop(T* temBuffer);
     bool queuePush(T* temBuffer);
     int getCurrentCount();
+    
+    //根据index获得vause,当超过_inPointer和_outPointer范围则失败，用于遍历数组，不会产生压栈推栈作用
+    bool getValueWithIndex(const long *index,T* value);
     GJQueue(int capacity);
     GJQueue();
 
@@ -90,12 +94,12 @@ GJQueue<T>::GJQueue(int capacity)
     _init();
 };
 
-template<class T>void
-GJQueue<T>::_init()
+template<class T>
+void GJQueue<T>::_init()
 {
     buffer = (T*)malloc(sizeof(T)*_capacity);
     _allocSize = _capacity;
-    autoResize = true;
+    autoResize = false;
     shouldWait = false;
     shouldNonatomic = false;
     _inPointer = 0;
@@ -104,7 +108,17 @@ GJQueue<T>::_init()
     popCopyBlock = NULL;
     pushCopyBlock = NULL;
 }
-
+template<class T>
+bool GJQueue<T>::getValueWithIndex(const long *index,T* value){
+    long inpoint = _inPointer%_allocSize;
+    long outpoint = _outPointer%_allocSize;
+    long current = index%_allocSize;
+    if (current < inpoint || current >= outpoint) {
+        return false;
+    }
+    *value = buffer[current];
+    return true;
+}
 /**
  *  深拷贝
  *
