@@ -94,7 +94,7 @@ static int i;
         char a[10] = " sefd";
         t.c = a;
         t.a = i++;
-    _queue.queuePush(&t);
+    _queue.queuePush(t);
 //    NSLog(@"push %d",i);
 }
 -(void)pop{

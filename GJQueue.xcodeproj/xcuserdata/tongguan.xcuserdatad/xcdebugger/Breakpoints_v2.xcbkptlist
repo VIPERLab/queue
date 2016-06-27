@@ -71,7 +71,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "95"
             endingLineNumber = "95"
-            landmarkName = "-pop"
+            landmarkName = "-push"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -86,7 +86,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "73"
-            endingLineNumber = "73">
+            endingLineNumber = "73"
+            landmarkName = "class GJQueue"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -101,7 +103,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
             endingLineNumber = "94"
-            landmarkName = "_init()"
+            landmarkName = "GJQueue(int capacity)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -117,7 +119,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "223"
             endingLineNumber = "223"
-            landmarkName = "_mutexSignal(pthread_cond_t* _cond)"
+            landmarkName = "_mutexWait(pthread_cond_t* _cond)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -149,7 +151,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "94"
             endingLineNumber = "94"
-            landmarkName = "-pop"
+            landmarkName = "-push"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -64,7 +64,7 @@ public:
     void (*pushCopyBlock)(T* dest,T* soc);//压栈时调用，用于自定义深复制，必要时需要申请内存，
     
     bool queuePop(T* temBuffer);
-    bool queuePush(T* temBuffer);
+    bool queuePush(T temBuffer);
     int currentLenth();
     
     //根据index获得vause,当超过_inPointer和_outPointer范围则失败，用于遍历数组，不会产生压栈推栈作用
@@ -153,7 +153,7 @@ bool GJQueue<T>::queuePop(T* temBuffer){
     return true;
 }
 template<class T>
-bool GJQueue<T>::queuePush(T* temBuffer){
+bool GJQueue<T>::queuePush(T temBuffer){
     
     _lock(&_uniqueLock);
     if ((_inPointer % _allocSize == _outPointer % _allocSize && _inPointer > _outPointer)) {
@@ -167,15 +167,14 @@ bool GJQueue<T>::queuePush(T* temBuffer){
                 GJQueueLOG("fail begin Wait out ----------\n");
                 return false;
             }
-            
             _lock(&_uniqueLock);
             GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         }
     }
     if (pushCopyBlock != NULL) {
-        pushCopyBlock(&buffer[_inPointer%_allocSize],temBuffer);
+        pushCopyBlock(&buffer[_inPointer%_allocSize],&temBuffer);
     }else{
-        buffer[_inPointer%_allocSize] = *temBuffer;
+        buffer[_inPointer%_allocSize] = temBuffer;
     }
     _inPointer++;
     _mutexSignal(&_inCond);
