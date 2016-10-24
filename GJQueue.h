@@ -251,7 +251,7 @@ bool GJQueue<T>::_unLock(pthread_mutex_t* mutex){
 template<class T>
 void GJQueue<T>::_resize(){
 
-    T* temBuffer = (T*)malloc(sizeof(T)*(_allocSize + _capacity));
+    T* temBuffer = (T*)malloc(sizeof(T)*(_allocSize + (_allocSize/_capacity)*_capacity));
     for (long i = _outPointer,j =0; i<_inPointer; i++,j++) {
         temBuffer[j] = buffer[i%_allocSize];
     }
