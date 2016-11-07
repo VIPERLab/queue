@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AE8B47BC1DD0C0E600A824D8 /* GJBufferPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */; };
 		C50856851C97EE2A002094FA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856841C97EE2A002094FA /* main.m */; };
 		C50856881C97EE2A002094FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856871C97EE2A002094FA /* AppDelegate.m */; };
 		C508568B1C97EE2A002094FA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C508568A1C97EE2A002094FA /* ViewController.mm */; };
@@ -16,6 +17,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GJBufferPool.cpp; sourceTree = "<group>"; };
+		AE8B47BA1DD0C09900A824D8 /* GJBufferPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJBufferPool.h; sourceTree = "<group>"; };
 		AEB50CD21CFC739300625586 /* GJQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJQueue.h; sourceTree = "<group>"; };
 		C50856801C97EE2A002094FA /* GJQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GJQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C50856841C97EE2A002094FA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -85,6 +88,8 @@
 			isa = PBXGroup;
 			children = (
 				AEB50CD21CFC739300625586 /* GJQueue.h */,
+				AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */,
+				AE8B47BA1DD0C09900A824D8 /* GJBufferPool.h */,
 			);
 			name = Class;
 			sourceTree = "<group>";
@@ -120,6 +125,8 @@
 				TargetAttributes = {
 					C508567F1C97EE2A002094FA = {
 						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = X33DX68294;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -161,6 +168,7 @@
 			files = (
 				C508568B1C97EE2A002094FA /* ViewController.mm in Sources */,
 				C50856881C97EE2A002094FA /* AppDelegate.m in Sources */,
+				AE8B47BC1DD0C0E600A824D8 /* GJBufferPool.cpp in Sources */,
 				C50856851C97EE2A002094FA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -273,7 +281,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				DEVELOPMENT_TEAM = X33DX68294;
 				GCC_INPUT_FILETYPE = automatic;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = GJQueue/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -281,6 +291,8 @@
 				OTHER_LIBTOOLFLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "--.GJQueue";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "268b1347-5796-40c7-a848-fb46f5991f03";
+				PROVISIONING_PROFILE_SPECIFIER = "dev.*";
 			};
 			name = Debug;
 		};
@@ -290,7 +302,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				DEVELOPMENT_TEAM = "";
 				GCC_INPUT_FILETYPE = automatic;
+				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = GJQueue/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

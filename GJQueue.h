@@ -21,6 +21,7 @@
 #define DEFAULT_MAX_COUNT 10
 
 
+
 template <class T> class GJQueue{
 
 private:
@@ -76,6 +77,7 @@ public:
 
 template<class T>
 int GJQueue<T>::currentLenth(){
+    
     return _outPointer - _inPointer;
 }
 template<class T>
@@ -180,9 +182,9 @@ bool GJQueue<T>::queuePush(T temBuffer){
     _mutexSignal(&_inCond);
     GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     _unLock(&_uniqueLock);
-    
     return true;
 }
+
 
 
 
