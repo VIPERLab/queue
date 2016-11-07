@@ -37,54 +37,19 @@ private:
 
 typedef struct GJPoolBuffer GJPoolBuffer;
 
-typedef struct GJQueuePool{
+typedef struct GJBufferPool{
 public:
-    GJQueuePool(long suitableBufferSize, int size);
+    GJBufferPool(long suitableBufferSize, int size);
+    GJBufferPool(){_init();};
     GJPoolBuffer* get(long size);
     void put(GJPoolBuffer* buffer);
-    ~GJQueuePool();
+    ~GJBufferPool();
 private:
+    void _init();
     GJQueue<GJPoolBuffer*> _queue;
     int _numElem;
-}GJQueuePool;
-#define DEFAULT_POOL_BUFFER_SIZE 10
-GJQueuePool::GJQueuePool(long suitableBufferSize, int size){
-    _queue.autoResize=true;
-    _queue.shouldWait=false;
-    _queue.shouldNonatomic=true;
-    if (size <= 0) {
-        _numElem=0;
-        return;
-    }
-    if (suitableBufferSize<=0) {   suitableBufferSize=10;    }
-    for (int i =0; i<size; i++) {
-        GJPoolBuffer* buffer = new GJPoolBuffer(suitableBufferSize);
-        _queue.queuePush(buffer);
-    }
-    
-};
-GJPoolBuffer* GJQueuePool::get(long size){
-    GJPoolBuffer* buffer=NULL;
-    if (_queue.currentLenth()==0) {
-        buffer = new GJPoolBuffer(size);
-    }else{
-        _queue.queuePop(&buffer);
-        if (buffer->caputreSize()<size) {
-            buffer->resizeCapture(size);
-        }
-        buffer->setLength(size);
-    }
-    return buffer;
-};
-void GJQueuePool::put(GJPoolBuffer* buffer){
-    _queue.queuePush(buffer);
-};
-GJQueuePool::~GJQueuePool(){
-    GJPoolBuffer* buffer;
-    while (_queue.queuePop(&buffer)) {
-        free(buffer);
-    }
-}
+}GJBufferPool;
+
 
 
 #endif /* GJBufferPool_h */

@@ -7,9 +7,9 @@
 //
 
 #include "GJBufferPool.h"
-bool GJQueueBuffer::resizeCapture(long caputre){
+bool GJPoolBuffer::resizeCapture(long caputre){
     if(caputre<0 || caputre < _length)return false;
-    
+    GJQueueLOG("resizefrome%ld to %ld\n",_caputureSize,caputre);
     uint8_t* temp = (uint8_t*)malloc(caputre);
     if(temp == NULL)return false;
     memcpy(temp, _data, _length);
@@ -17,4 +17,45 @@ bool GJQueueBuffer::resizeCapture(long caputre){
     _data=temp;
     _caputureSize=caputre;
     return true;
+}
+
+
+
+void GJBufferPool::_init(){
+    _queue.autoResize=true;
+    _queue.shouldWait=false;
+    _queue.shouldNonatomic=true;
+    _numElem=0;
+}
+#define DEFAULT_POOL_BUFFER_SIZE 10
+GJBufferPool::GJBufferPool(long suitableBufferSize, int size){
+    _init();
+    if (size <= 0) {return;}
+    if (suitableBufferSize<=0) {   suitableBufferSize=10;    }
+    for (int i =0; i<size; i++) {
+        GJPoolBuffer* buffer = new GJPoolBuffer(suitableBufferSize);
+        _queue.queuePush(buffer);
+    }
+    
+};
+GJPoolBuffer* GJBufferPool::get(long size){
+    GJPoolBuffer* buffer=NULL;
+    if (_queue.queuePop(&buffer)) {
+        if (buffer->caputreSize()<size) {
+            buffer->resizeCapture(size);
+        }
+        buffer->setLength(size);
+    }else{
+        buffer = new GJPoolBuffer(size);
+    }
+    return buffer;
+};
+void GJBufferPool::put(GJPoolBuffer* buffer){
+    _queue.queuePush(buffer);
+};
+GJBufferPool::~GJBufferPool(){
+    GJPoolBuffer* buffer;
+    while (_queue.queuePop(&buffer)) {
+        free(buffer);
+    }
 }

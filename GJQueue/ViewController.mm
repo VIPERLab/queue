@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "GJQueue.h"
+#import "GJBufferPool.h"
 typedef struct st{
     int a;
     char* c;
@@ -36,8 +37,7 @@ static void pushC(st* d,st* s){
     memcpy(d->c, s->c, strlen(s->c)+1);
     d->a = s->a;
 }
-- (void)viewDidLoad {
-    [super viewDidLoad];
+-(void)queueTest{
     date = [NSDate date];
     run = YES;
     _queue.autoResize = false;
@@ -57,8 +57,8 @@ static void pushC(st* d,st* s){
     //autoresize = false,wait = no nonatomic = no                  10523.068085
     //autoresize = false,wait = yes nonatomic = yes                  10078.879488
     //autoresize = false,wait = yes nonatomic = no                  9621.923693
-
-
+    
+    
     popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
     pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
     UIButton* btn = [[UIButton alloc]initWithFrame:(CGRect){100,100,100,60}];
@@ -79,12 +79,45 @@ static void pushC(st* d,st* s){
             sleep(0.2);
         }
     });
-//    dispatch_async(popq, ^{
-//        while (run) {
-//            [self pop];
-//            sleep(0.2);
-//        }
-//    });
+    //    dispatch_async(popq, ^{
+    //        while (run) {
+    //            [self pop];
+    //            sleep(0.2);
+    //        }
+    //    });
+}
+
+-(void)poolTest{
+    GJBufferPool pool;
+    GJQueue<GJPoolBuffer*>queue;
+    run=YES;
+    while (run) {
+        int random = arc4random()%4;
+        NSLog(@"random:%d,",random);
+        if (random!=0) {
+            GJPoolBuffer* buffer = pool.get(40+random*random);
+            NSString* string = [NSString stringWithFormat:@"bufferSize:%ld,capture:%ld",buffer->length(),buffer->caputreSize()];
+            memcpy(buffer->data(), string.UTF8String, string.length+1);
+            queue.queuePush(buffer);
+        }else{
+            GJPoolBuffer* buffer;
+            if (queue.queuePop(&buffer)) {
+                NSLog(@"POP %s",(char*)buffer->data());
+                pool.put(buffer);
+            }else{
+                NSLog(@"NO POP");
+            }
+            
+        }
+        sleep(1);
+
+    }
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+//    [self queueTest];
+    [self poolTest];
 }
 static int i;
 -(void)push

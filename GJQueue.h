@@ -78,7 +78,7 @@ public:
 template<class T>
 int GJQueue<T>::currentLenth(){
     
-    return _outPointer - _inPointer;
+    return (int)(_outPointer - _inPointer);
 }
 template<class T>
 GJQueue<T>::GJQueue()
