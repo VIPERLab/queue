@@ -7,12 +7,14 @@
 //
 
 #include "GJBufferPool.h"
-bool GJPoolBuffer::resizeCapture(long caputre){
+bool GJPoolBuffer::resizeCapture(long caputre,bool copy){
     if(caputre<0 || caputre < _length)return false;
     GJQueueLOG("resizefrome%ld to %ld\n",_caputureSize,caputre);
     uint8_t* temp = (uint8_t*)malloc(caputre);
     if(temp == NULL)return false;
-    memcpy(temp, _data, _length);
+    if (copy) {
+        memcpy(temp, _data, _length);
+    }
     free(_data);
     _data=temp;
     _caputureSize=caputre;
@@ -42,7 +44,9 @@ GJPoolBuffer* GJBufferPool::get(long size){
     GJPoolBuffer* buffer=NULL;
     if (_queue.queuePop(&buffer)) {
         if (buffer->caputreSize()<size) {
-            buffer->resizeCapture(size);
+            free(buffer->data());
+            buffer->_data=(uint8_t*)malloc(size);
+            buffer->_caputureSize=size;
         }
         buffer->setLength(size);
     }else{

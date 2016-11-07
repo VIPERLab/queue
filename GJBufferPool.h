@@ -12,6 +12,7 @@
 #include "GJQueue.h"
 #include <string>
 
+struct GJBufferPool;
 
 typedef struct GJBuffer{
 public:
@@ -30,9 +31,10 @@ public:
     GJPoolBuffer(long length):GJBuffer(length){_caputureSize=_length;}
     long caputreSize(){return _caputureSize;}
     bool setLength(long length){if(length<=_caputureSize){_length=length;return true;}else return false;}
-    bool resizeCapture(long caputre);
+    bool resizeCapture(long caputre,bool copy);
 private:
     long _caputureSize;//申请空间的大小
+    friend GJBufferPool;
 };
 
 typedef struct GJPoolBuffer GJPoolBuffer;
@@ -43,11 +45,13 @@ public:
     GJBufferPool(){_init();};
     GJPoolBuffer* get(long size);
     void put(GJPoolBuffer* buffer);
+    int availableNum(){return _queue.currentLenth();}
     ~GJBufferPool();
 private:
     void _init();
     GJQueue<GJPoolBuffer*> _queue;
     int _numElem;
+    
 }GJBufferPool;
 
 
