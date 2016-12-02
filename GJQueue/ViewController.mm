@@ -41,8 +41,7 @@ static void pushC(st* d,st* s){
     date = [NSDate date];
     run = YES;
     _queue.autoResize = false;
-    _queue.pushCopyBlock = pushC;
-    _queue.popCopyBlock = popC;
+
     _queue.shouldWait = YES;
     _queue.shouldNonatomic = YES;
     
@@ -89,28 +88,27 @@ static void pushC(st* d,st* s){
 
 -(void)poolTest{
     GJBufferPool pool;
-    GJQueue<GJPoolBuffer*>queue;
+    GJQueue<GJBuffer*>queue;
     run=YES;
     while (run) {
         int random = arc4random()%4;
         NSLog(@"random:%d,",random);
         if (random!=0) {
-            GJPoolBuffer* buffer = pool.get(40+random*random);
-            NSString* string = [NSString stringWithFormat:@"bufferSize:%ld,capture:%ld",buffer->length(),buffer->caputreSize()];
-            memcpy(buffer->data(), string.UTF8String, string.length+1);
+            GJBuffer* buffer = pool.getBuffer(40+random*random);
+            NSString* string = [NSString stringWithFormat:@"bufferSize:%d",buffer->size];
+            memcpy(buffer->data, string.UTF8String, string.length+1);
             queue.queuePush(buffer);
         }else{
-            GJPoolBuffer* buffer;
+            GJBuffer* buffer;
             if (queue.queuePop(&buffer)) {
-                NSLog(@"POP %s",(char*)buffer->data());
-                pool.put(buffer);
+                NSLog(@"POP %s",(char*)buffer->data);
+                pool.setBuffer(buffer);
             }else{
                 NSLog(@"NO POP");
             }
             
         }
         sleep(1);
-
     }
 }
 

@@ -9,51 +9,32 @@
 #ifndef GJBufferPool_h
 #define GJBufferPool_h
 
-#include "GJQueue.h"
-#include <string>
+#import "GJQueue.h"
 
-struct GJBufferPool;
-
+class GJBufferPool;
 typedef struct GJBuffer{
-public:
-    uint8_t* data(){return _data;};
-    long length(){return _length;}
-    GJBuffer(long length){if(length<0){_length=0;_data=NULL;return;}; _data=(uint8_t*)malloc(length);_length=length;}
-    GJBuffer(){_data=NULL;_length=0;}
-protected:
-    uint8_t* _data;
-    long _length;
-    ~GJBuffer(){if(_data)free(_data);}
-}GJBuffer;
-
-struct GJPoolBuffer:GJBuffer{
-public:
-    GJPoolBuffer(long length):GJBuffer(length){_caputureSize=_length;}
-    long caputreSize(){return _caputureSize;}
-    bool setLength(long length){if(length<=_caputureSize){_length=length;return true;}else return false;}
-    bool resizeCapture(long caputre,bool copy);
 private:
-    long _caputureSize;//申请空间的大小
+    int _capacity;//readOnly,real data size
+public:
+    void* data;
+    int size;
+    GJBuffer(int8_t* bufferData,int bufferSize);
+    GJBuffer();
+    int capacity();
     friend GJBufferPool;
-};
+} GJBuffer;
 
-typedef struct GJPoolBuffer GJPoolBuffer;
 
-typedef struct GJBufferPool{
-public:
-    GJBufferPool(long suitableBufferSize, int size);
-    GJBufferPool(){_init();};
-    GJPoolBuffer* get(long size);
-    void put(GJPoolBuffer* buffer);
-    int availableNum(){return _queue.currentLenth();}
-    ~GJBufferPool();
+class GJBufferPool {
 private:
-    void _init();
-    GJQueue<GJPoolBuffer*> _queue;
-    int _numElem;
-    
-}GJBufferPool;
-
-
+    GJQueue<GJBuffer*> _cacheQueue; //用指针，效率更高
+public:
+    GJBufferPool();//自己新建空间
+    static GJBufferPool* defaultBufferPool();//共享的空间   //注意内存紧张时释放内存
+    GJBuffer* getBuffer(int size);
+    void setBuffer(GJBuffer* buffer);
+    void cleanBuffer();
+    ~GJBufferPool();
+};
 
 #endif /* GJBufferPool_h */

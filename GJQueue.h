@@ -10,6 +10,7 @@
 #ifndef GJQueue_h
 #define GJQueue_h
 #include <stdio.h>
+#include <string.h>
 #include <pthread.h>
 #include <assert.h>
 #ifdef DEBUG
@@ -23,7 +24,7 @@
 
 
 template <class T> class GJQueue{
-
+    
 private:
     T *buffer;
     long _inPointer;  //尾
@@ -46,33 +47,28 @@ private:
     void _init();
     void _resize();
 public:
-
+    
     ~GJQueue(){
         _mutexDestory();
         free(buffer);
     };
-
+    
 #pragma mark DELEGATE
     bool shouldWait;  //没有数据时是否支持等待，当为autoResize 为YES时，push永远不会等待
     bool shouldNonatomic; //是否多线程，
-    //是否支持自动增长，当为YES时，push永远不会等待，只会重新申请内存,默认为false
-    bool autoResize;
-    /**
-     *  //自定义深复制，比如需要复制结构体里面的指针需要复制，为空时则直接赋值指针；
-     *dest 为目标地址，soc是赋值源
-     */
-    void (*popCopyBlock)(T* dest,T* soc);//出队列时调用，释放入队列时的内存
-    void (*pushCopyBlock)(T* dest,T* soc);//压栈时调用，用于自定义深复制，必要时需要申请内存，
+    bool autoResize;//是否支持自动增长，当为YES时，push永远不会等待，只会重新申请内存,默认为false
+    
     
     bool queuePop(T* temBuffer);
     bool queuePush(T temBuffer);
     int currentLenth();
     
-    //根据index获得vause,当超过_inPointer和_outPointer范围则失败，用于遍历数组，不会产生压栈推栈作用
-    bool getValueWithIndex(const long *index,T* value);
+    //根据index获得vause,当超过_inPointer和_outPointer范围则失败，用于遍历数组，不会产生压出队列作用
+    bool peekValueWithIndex(const long index,T* value);
     GJQueue(int capacity);
     GJQueue();
-
+    void clean();
+    
 };
 
 template<class T>
@@ -101,23 +97,19 @@ void GJQueue<T>::_init()
 {
     buffer = (T*)malloc(sizeof(T)*_capacity);
     _allocSize = _capacity;
-    autoResize = false;
+    autoResize = true;
     shouldWait = false;
-    shouldNonatomic = false;
+    shouldNonatomic = true;
     _inPointer = 0;
     _outPointer = 0;
     _mutexInit();
-    popCopyBlock = NULL;
-    pushCopyBlock = NULL;
 }
 template<class T>
-bool GJQueue<T>::getValueWithIndex(const long *index,T* value){
-    long inpoint = _inPointer%_allocSize;
-    long outpoint = _outPointer%_allocSize;
-    long current = index%_allocSize;
-    if (current < inpoint || current >= outpoint) {
+bool GJQueue<T>::peekValueWithIndex(const long index,T* value){
+    if (index < _outPointer || index >= _inPointer) {
         return false;
     }
+    long current = index%_allocSize;
     *value = buffer[current];
     return true;
 }
@@ -130,7 +122,6 @@ bool GJQueue<T>::getValueWithIndex(const long *index,T* value){
  */
 template<class T>
 bool GJQueue<T>::queuePop(T* temBuffer){
-    
     _lock(&_uniqueLock);
     if (_inPointer <= _outPointer) {
         _unLock(&_uniqueLock);
@@ -142,12 +133,10 @@ bool GJQueue<T>::queuePop(T* temBuffer){
         _lock(&_uniqueLock);
         GJQueueLOG("after Wait in.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     }
+    int index = _outPointer%_allocSize;
+    *temBuffer = buffer[index];
+    memset(&buffer[index], 0, sizeof(T));//防止在oc里的引用一直不释放；
     
-    if (popCopyBlock != NULL) {
-        popCopyBlock(temBuffer, &buffer[_outPointer%_allocSize]);
-    }else{
-        *temBuffer = buffer[_outPointer%_allocSize];
-    }
     _outPointer++;
     _mutexSignal(&_outCond);
     GJQueueLOG("after signal out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
@@ -156,7 +145,6 @@ bool GJQueue<T>::queuePop(T* temBuffer){
 }
 template<class T>
 bool GJQueue<T>::queuePush(T temBuffer){
-    
     _lock(&_uniqueLock);
     if ((_inPointer % _allocSize == _outPointer % _allocSize && _inPointer > _outPointer)) {
         if (autoResize) {
@@ -173,11 +161,7 @@ bool GJQueue<T>::queuePush(T temBuffer){
             GJQueueLOG("after Wait out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
         }
     }
-    if (pushCopyBlock != NULL) {
-        pushCopyBlock(&buffer[_inPointer%_allocSize],&temBuffer);
-    }else{
-        buffer[_inPointer%_allocSize] = temBuffer;
-    }
+    buffer[_inPointer%_allocSize] = temBuffer;
     _inPointer++;
     _mutexSignal(&_inCond);
     GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
@@ -185,6 +169,16 @@ bool GJQueue<T>::queuePush(T temBuffer){
     return true;
 }
 
+template<class T>
+void GJQueue<T>::clean(){
+    _lock(&_uniqueLock);
+    while (_outPointer<_inPointer) {
+        memset(&buffer[_outPointer++%_allocSize], 0, sizeof(T));//防止在oc里的引用一直不释放；
+    }
+    _inPointer=_outPointer=0;
+    _mutexSignal(&_outCond);
+    _unLock(&_uniqueLock);
+}
 
 
 
@@ -252,7 +246,7 @@ bool GJQueue<T>::_unLock(pthread_mutex_t* mutex){
 }
 template<class T>
 void GJQueue<T>::_resize(){
-
+    
     T* temBuffer = (T*)malloc(sizeof(T)*(_allocSize + (_allocSize/_capacity)*_capacity));
     for (long i = _outPointer,j =0; i<_inPointer; i++,j++) {
         temBuffer[j] = buffer[i%_allocSize];
