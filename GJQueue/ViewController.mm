@@ -26,24 +26,12 @@ typedef struct st{
 }
 @end
 @implementation ViewController
-static void popC(st* d,st* s){
-    d->c = (char*)malloc(strlen(s->c)+1);
-    memcpy(d->c, s->c, strlen(s->c)+1);
-    d->a = s->a;
-    free(s->c);
-}
-static void pushC(st* d,st* s){
-    d->c = (char*)malloc(strlen(s->c)+1);
-    memcpy(d->c, s->c, strlen(s->c)+1);
-    d->a = s->a;
-}
+
 -(void)queueTest{
     date = [NSDate date];
     run = YES;
     _queue.autoResize = false;
 
-    _queue.shouldWait = YES;
-    _queue.shouldNonatomic = YES;
     
     //push pop不同线程 线程睡0.2
     //autoresize = false,wait = yes nonatomic = yes    9239.936629/s
@@ -60,6 +48,7 @@ static void pushC(st* d,st* s){
     
     popq = dispatch_queue_create("pop", DISPATCH_QUEUE_CONCURRENT);
     pushq = dispatch_queue_create("push", DISPATCH_QUEUE_CONCURRENT);
+    
     UIButton* btn = [[UIButton alloc]initWithFrame:(CGRect){100,100,100,60}];
     [btn setBackgroundColor:[UIColor greenColor]];
     [btn setTitle:@"push" forState:UIControlStateNormal];
@@ -74,42 +63,44 @@ static void pushC(st* d,st* s){
     dispatch_async(pushq, ^{
         while (run) {
             [self push];
-            [self pop];
-            sleep(0.2);
+            usleep(200);
         }
     });
-    //    dispatch_async(popq, ^{
-    //        while (run) {
-    //            [self pop];
-    //            sleep(0.2);
-    //        }
-    //    });
+        dispatch_async(popq, ^{
+            while (run) {
+                [self pop];
+                usleep(250);
+            }
+        });
 }
 
 -(void)poolTest{
-    GJBufferPool pool;
-    GJQueue<GJBuffer*>queue;
-    run=YES;
-    while (run) {
-        int random = arc4random()%4;
-        NSLog(@"random:%d,",random);
-        if (random!=0) {
-            GJBuffer* buffer = pool.getBuffer(40+random*random);
-            NSString* string = [NSString stringWithFormat:@"bufferSize:%d",buffer->size];
-            memcpy(buffer->data, string.UTF8String, string.length+1);
-            queue.queuePush(buffer);
-        }else{
-            GJBuffer* buffer;
-            if (queue.queuePop(&buffer)) {
-                NSLog(@"POP %s",(char*)buffer->data);
-                pool.setBuffer(buffer);
+
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        GJBufferPool pool;
+        GJQueue<GJBuffer*>queue;
+        run=YES;
+        while (run) {
+            int random = arc4random()%4;
+            NSLog(@"random:%d,",random);
+            if (random!=0) {
+                GJBuffer* buffer = pool.getBuffer(40+random*random);
+                NSString* string = [NSString stringWithFormat:@"bufferSize:%d",buffer->size];
+                memcpy(buffer->data, string.UTF8String, string.length+1);
+                queue.queuePush(buffer);
             }else{
-                NSLog(@"NO POP");
+                GJBuffer* buffer;
+                if (queue.queuePop(&buffer)) {
+                    NSLog(@"POP %s",(char*)buffer->data);
+                    pool.setBuffer(buffer);
+                }else{
+                    NSLog(@"NO POP");
+                }
+                
             }
-            
+            sleep(1);
         }
-        sleep(1);
-    }
+    });
 }
 
 - (void)viewDidLoad {
@@ -120,23 +111,27 @@ static void pushC(st* d,st* s){
 static int i;
 -(void)push
 {
-   
         __block st t;
-        char a[10] = " sefd";
-        t.c = a;
-        t.a = i++;
-    _queue.queuePush(t);
+//        char a[10] = " sefd";
+//        t.c = a;
+//        t.a = i++;
+//        NSDate* locdate = [NSDate date];
+//        _queue.queuePush(t,1000);
+//        NSLog(@"date:%f",[[NSDate date]timeIntervalSinceDate:locdate]);
+   
+
+
 //    NSLog(@"push %d",i);
 }
 -(void)pop{
-//    int *j ;
-//    _queue->queueRetainPop(&j);
-    
-    
-        st t;
-        if (_queue.queuePop(&t)) {
-            NSLog(@"pop:%d",t.a);
-        };
+////    int *j ;
+////    _queue->queueRetainPop(&j);
+//    
+//    
+//        st t;
+//        if (_queue.queuePop(&t)) {
+//            NSLog(@"pop:%d",t.a);
+//        };
 
 }
 //7308/s

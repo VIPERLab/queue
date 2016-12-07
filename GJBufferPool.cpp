@@ -23,8 +23,6 @@ int GJBuffer::capacity(){
 
 GJBufferPool::GJBufferPool(){
     _cacheQueue.autoResize = true;
-    _cacheQueue.shouldNonatomic = false;
-    _cacheQueue.shouldWait = false;
 }
 GJBufferPool::~GJBufferPool(){
     cleanBuffer();
@@ -38,7 +36,7 @@ GJBufferPool* GJBufferPool::defaultBufferPool()
 GJBuffer* GJBufferPool::getBuffer(int size){
     static int mc = 0;
     GJBuffer* buffer = NULL;
-    if(_cacheQueue.queuePop(&buffer)) {
+    if(_cacheQueue.queuePop(&buffer,0)) {
         if (buffer->_capacity < size) {
             free(buffer->data);
             buffer->data = (int8_t*)malloc(size);
@@ -57,7 +55,7 @@ GJBuffer* GJBufferPool::getBuffer(int size){
 }
 
 void GJBufferPool::setBuffer(GJBuffer* buffer){
-    _cacheQueue.queuePush(buffer);
+    _cacheQueue.queuePush(buffer,0);
 }
 void GJBufferPool::cleanBuffer(){
     GJBuffer* buffer;
