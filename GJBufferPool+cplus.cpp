@@ -6,7 +6,7 @@
 //  Copyright © 2016年 MinorUncle. All rights reserved.
 //
 
-#include "GJBufferPool.h"
+#include "GJBufferPool+cplus.h"
 GJBuffer::GJBuffer(int8_t* bufferData,int bufferSize){
     static int i = 0;
     printf("GJBuffer count:%d\n",++i);

@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AE8B47BC1DD0C0E600A824D8 /* GJBufferPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */; };
+		AE7AE3581E12C02700639DD7 /* GJQueue.c in Sources */ = {isa = PBXBuildFile; fileRef = AE7AE3561E12C02700639DD7 /* GJQueue.c */; };
+		AE7AE35B1E12D08B00639DD7 /* GJBufferPool.c in Sources */ = {isa = PBXBuildFile; fileRef = AE7AE3591E12D08B00639DD7 /* GJBufferPool.c */; };
+		AE8B47BC1DD0C0E600A824D8 /* GJBufferPool+cplus.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AE8B47B91DD0C09900A824D8 /* GJBufferPool+cplus.cpp */; };
 		C50856851C97EE2A002094FA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856841C97EE2A002094FA /* main.m */; };
 		C50856881C97EE2A002094FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C50856871C97EE2A002094FA /* AppDelegate.m */; };
 		C508568B1C97EE2A002094FA /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C508568A1C97EE2A002094FA /* ViewController.mm */; };
@@ -17,9 +19,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GJBufferPool.cpp; sourceTree = "<group>"; };
-		AE8B47BA1DD0C09900A824D8 /* GJBufferPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJBufferPool.h; sourceTree = "<group>"; };
-		AEB50CD21CFC739300625586 /* GJQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJQueue.h; sourceTree = "<group>"; };
+		AE7AE3561E12C02700639DD7 /* GJQueue.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GJQueue.c; sourceTree = "<group>"; };
+		AE7AE3571E12C02700639DD7 /* GJQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJQueue.h; sourceTree = "<group>"; };
+		AE7AE3591E12D08B00639DD7 /* GJBufferPool.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = GJBufferPool.c; sourceTree = "<group>"; };
+		AE7AE35A1E12D08B00639DD7 /* GJBufferPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GJBufferPool.h; sourceTree = "<group>"; };
+		AE8B47B91DD0C09900A824D8 /* GJBufferPool+cplus.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "GJBufferPool+cplus.cpp"; sourceTree = "<group>"; };
+		AE8B47BA1DD0C09900A824D8 /* GJBufferPool+cplus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GJBufferPool+cplus.h"; sourceTree = "<group>"; };
+		AEB50CD21CFC739300625586 /* GJQueue+cplus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "GJQueue+cplus.h"; sourceTree = "<group>"; };
 		C50856801C97EE2A002094FA /* GJQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GJQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C50856841C97EE2A002094FA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C50856861C97EE2A002094FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -87,9 +93,13 @@
 		C508569A1C97EE33002094FA /* Class */ = {
 			isa = PBXGroup;
 			children = (
-				AEB50CD21CFC739300625586 /* GJQueue.h */,
-				AE8B47BA1DD0C09900A824D8 /* GJBufferPool.h */,
-				AE8B47B91DD0C09900A824D8 /* GJBufferPool.cpp */,
+				AEB50CD21CFC739300625586 /* GJQueue+cplus.h */,
+				AE8B47BA1DD0C09900A824D8 /* GJBufferPool+cplus.h */,
+				AE8B47B91DD0C09900A824D8 /* GJBufferPool+cplus.cpp */,
+				AE7AE3561E12C02700639DD7 /* GJQueue.c */,
+				AE7AE3571E12C02700639DD7 /* GJQueue.h */,
+				AE7AE3591E12D08B00639DD7 /* GJBufferPool.c */,
+				AE7AE35A1E12D08B00639DD7 /* GJBufferPool.h */,
 			);
 			name = Class;
 			sourceTree = "<group>";
@@ -166,9 +176,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AE7AE3581E12C02700639DD7 /* GJQueue.c in Sources */,
 				C508568B1C97EE2A002094FA /* ViewController.mm in Sources */,
 				C50856881C97EE2A002094FA /* AppDelegate.m in Sources */,
-				AE8B47BC1DD0C0E600A824D8 /* GJBufferPool.cpp in Sources */,
+				AE8B47BC1DD0C0E600A824D8 /* GJBufferPool+cplus.cpp in Sources */,
+				AE7AE35B1E12D08B00639DD7 /* GJBufferPool.c in Sources */,
 				C50856851C97EE2A002094FA /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

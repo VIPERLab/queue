@@ -7,8 +7,8 @@
 //
 
 #import "ViewController.h"
-#import "GJQueue.h"
-#import "GJBufferPool.h"
+#import "GJQueue+cplus.h"
+#import "GJBufferPool+cplus.h"
 typedef struct st{
     int a;
     char* c;
