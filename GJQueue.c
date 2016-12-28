@@ -81,11 +81,19 @@ int queuePeekValue(GJQueue* q, const long index,void** value){
     *value = q->queue[current];
     return 0;
 }
-int queuePeekTopOutValue(GJQueue* q,void** value){
+int queuePeekTopOutValue(GJQueue* q,void** value, int ms){
     void* retV = NULL;
     int ret = -1;
     queueLockPop(q);
     if (  q->outPointer == q->inPointer) {
+        GJQueueLOG("begin Wait peek in ----------\n");
+        if (ms <= 0 || !_condWait(&q->outCond,&q->popLock,ms) || q->outPointer == q->inPointer) {
+            GJQueueLOG("fail Wait in ----------\n");
+            queueUnLockPop(q);
+            *value = NULL;
+            return -1;
+        }
+        GJQueueLOG("after Wait peek in.  incount:%ld  outcount:%ld----------\n",q->inPointer,q->outPointer);
         retV = NULL;
     }else{
         retV = q->queue[q->outPointer % q->allocSize];
@@ -106,7 +114,7 @@ int queuePop(GJQueue* q,void** temBuffer,int ms){
     queueLockPop(q);
     if (q->inPointer <= q->outPointer) {
         GJQueueLOG("begin Wait in ----------\n");
-        if (ms <= 0 || !_condWait(&q->outCond,&q->popLock,ms)) {
+        if (ms <= 0 || !_condWait(&q->outCond,&q->popLock,ms) || q->inPointer <= q->outPointer) {
             GJQueueLOG("fail Wait in ----------\n");
             queueUnLockPop(q);
             return -1;
@@ -126,7 +134,7 @@ int queuePop(GJQueue* q,void** temBuffer,int ms){
 }
 int queuePush(GJQueue* q,void* temBuffer,int ms){
     queueLockPush(q);
-    if ((q->inPointer % q->allocSize == q->outPointer % q->allocSize && q->inPointer > q->outPointer)) {
+    if (q->inPointer - q->outPointer >= q->allocSize) {
         if (q->autoResize) {
             //resize
             void** temBuffer = (void**)malloc(sizeof(void*)*(q->allocSize * 2));
@@ -140,7 +148,7 @@ int queuePush(GJQueue* q,void* temBuffer,int ms){
             q->allocSize += q->capacity;
         }else{
             GJQueueLOG("begin Wait out ----------\n");
-            if (ms <= 0 || !_condWait(&q->inCond,&q->pushLock,ms)) {
+            if (ms <= 0 || !_condWait(&q->inCond,&q->pushLock,ms) || q->inPointer - q->outPointer >= q->allocSize) {
                 GJQueueLOG("fail begin Wait out ----------\n");
                 queueUnLockPush(q);
                 return -1;
@@ -184,6 +192,8 @@ int queueCreate(GJQueue** outQ,int capacity){
     pthread_mutex_init(&q->popLock, NULL);
     pthread_mutex_init(&q->pushLock, NULL);
     if (capacity<=0) {capacity = DEFAULT_MAX_COUNT;}
+    q->capacity = capacity;
+    q->allocSize = capacity;
     q->queue = (void**)malloc(sizeof(void*) * q->capacity);
     if (!q->queue) {
         free(q);

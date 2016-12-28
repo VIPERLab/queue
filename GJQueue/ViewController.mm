@@ -7,19 +7,29 @@
 //
 
 #import "ViewController.h"
-#import "GJQueue+cplus.h"
-#import "GJBufferPool+cplus.h"
+
+#define CQUEUE
+#ifdef CQUEUE
+extern "C"{
+    #import "GJQueue.h"
+    #import "GJBufferPool.h"
+}
+#endif
 typedef struct st{
     int a;
     char* c;
-    
 }st;
+
 
 @interface ViewController ()
 {
     bool run;
+#ifdef CQUEUE
+    GJQueue* _queue;
+#else
     GJQueue<st> _queue;
     st _s;
+#endif
     dispatch_queue_t popq;
     dispatch_queue_t pushq;
     NSDate* date;
@@ -30,9 +40,9 @@ typedef struct st{
 -(void)queueTest{
     date = [NSDate date];
     run = YES;
-    _queue.autoResize = false;
+    queueCreate(&_queue, 100);
+    _queue->autoResize = false;
 
-    
     //push pop不同线程 线程睡0.2
     //autoresize = false,wait = yes nonatomic = yes    9239.936629/s
     //autoresize = true,wait = yes nonatomic = yes  8105.421133/s
@@ -63,7 +73,7 @@ typedef struct st{
     dispatch_async(pushq, ^{
         while (run) {
             [self push];
-            usleep(200);
+            usleep(250);
         }
     });
         dispatch_async(popq, ^{
@@ -76,43 +86,46 @@ typedef struct st{
 
 -(void)poolTest{
 
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        GJBufferPool pool;
-        GJQueue<GJBuffer*>queue;
-        run=YES;
-        while (run) {
-            int random = arc4random()%4;
-            NSLog(@"random:%d,",random);
-            if (random!=0) {
-                GJBuffer* buffer = pool.getBuffer(40+random*random);
-                NSString* string = [NSString stringWithFormat:@"bufferSize:%d",buffer->size];
-                memcpy(buffer->data, string.UTF8String, string.length+1);
-                queue.queuePush(buffer);
-            }else{
-                GJBuffer* buffer;
-                if (queue.queuePop(&buffer)) {
-                    NSLog(@"POP %s",(char*)buffer->data);
-                    pool.setBuffer(buffer);
-                }else{
-                    NSLog(@"NO POP");
-                }
-                
-            }
-            sleep(1);
-        }
-    });
+//    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+//        GJBufferPool pool;
+//        GJQueue<GJBuffer*>queue;
+//        run=YES;
+//        while (run) {
+//            int random = arc4random()%4;
+//            NSLog(@"random:%d,",random);
+//            if (random!=0) {
+//                GJBuffer* buffer = pool.getBuffer(40+random*random);
+//                NSString* string = [NSString stringWithFormat:@"bufferSize:%d",buffer->size];
+//                memcpy(buffer->data, string.UTF8String, string.length+1);
+//                queue.queuePush(buffer);
+//            }else{
+//                GJBuffer* buffer;
+//                if (queue.queuePop(&buffer)) {
+//                    NSLog(@"POP %s",(char*)buffer->data);
+//                    pool.setBuffer(buffer);
+//                }else{
+//                    NSLog(@"NO POP");
+//                }
+//                
+//            }
+//            usleep(100);
+//        }
+//    });
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-//    [self queueTest];
-    [self poolTest];
+    [self queueTest];
+//    [self poolTest];
 }
 static int i;
 -(void)push
 {
-        __block st t;
-//        char a[10] = " sefd";
+    i++;
+        char* a = (char*)malloc(10);
+        memcpy(a , " sefdsdfsdf", 10);
+        *(uint8_t*)a = i;
+        queuePush(_queue, a , 1000);
 //        t.c = a;
 //        t.a = i++;
 //        NSDate* locdate = [NSDate date];
@@ -124,6 +137,13 @@ static int i;
 //    NSLog(@"push %d",i);
 }
 -(void)pop{
+    char* a;
+    
+    if(queuePop(_queue, (void**)&a, 1000) >=0){
+        printf("a:%s\n",a);
+        free(a);
+    };
+
 ////    int *j ;
 ////    _queue->queueRetainPop(&j);
 //    

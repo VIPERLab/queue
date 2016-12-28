@@ -11,6 +11,11 @@
 #include <pthread.h>
 #include <stdio.h>
 
+typedef struct _GJData{
+    void* data;
+    unsigned int size;
+}GJData;
+
 typedef struct _GJQueue{
     long inPointer;  //尾
     long outPointer; //头
@@ -36,7 +41,7 @@ long queueGetLength(GJQueue* q);
 
 //根据index获得vause,当超过inPointer和outPointer范围则失败，用于遍历数组，不会产生压出队列作用
 int queuePeekValue(GJQueue* q,const long index,void** value);
-int queuePeekTopOutValue(GJQueue* q,void** value);
+int queuePeekTopOutValue(GJQueue* q,void** value, int ms);//没有数据则等待ms 时长
 
 int queueUnLockPop(GJQueue* q);
 int queueLockPush(GJQueue* q);

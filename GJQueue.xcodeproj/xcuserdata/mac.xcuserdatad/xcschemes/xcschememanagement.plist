@@ -9,9 +9,19 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>libQueue.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>04300FD91E13669C0059262A</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>C508567F1C97EE2A002094FA</key>
 		<dict>
 			<key>primary</key>

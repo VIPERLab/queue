@@ -139,7 +139,7 @@ bool GJQueue<T>::queuePop(T* temBuffer,int ms){
     _condSignal(&_inCond);
     GJQueueLOG("after signal out.  incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     _unLock(&_popLock);
-    assert(*temBuffer);
+//    assert(*temBuffer);
     return true;
 }
 template<class T>
@@ -164,7 +164,7 @@ bool GJQueue<T>::queuePush(T temBuffer,int ms){
     _condSignal(&_outCond);
     GJQueueLOG("after signal in. incount:%ld  outcount:%ld----------\n",_inPointer,_outPointer);
     _unLock(&_pushLock);
-    assert(temBuffer);
+//    assert(temBuffer);
 
     return true;
 }
